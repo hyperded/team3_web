@@ -8,7 +8,8 @@ const mongoString = process.env.DATABASE_URL
 mongoose.connect(mongoString);
 const database = mongoose.connection
 const routes = require('./routes/routes');  
-
+const bodyParser = require('body-parser');
+app.use(bodyParser.json())
 
 
 app.use('/api', routes)
