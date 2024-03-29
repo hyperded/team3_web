@@ -32,13 +32,12 @@ router.post('/login', async (req, res) => {
 
     try{
         if(check.password == data.password){
-            console.log("true!")      
+            res.app("true!")      
             res.json(data)     
         }
     }
     catch{
         res.send("wrong username/password!")
-
     }
 })
 
