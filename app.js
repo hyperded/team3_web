@@ -9,6 +9,7 @@ mongoose.connect(mongoString);
 const database = mongoose.connection
 const routes = require('./routes/routes');  
 const bodyParser = require('body-parser');
+const hbs = require('hbs')
 app.use(bodyParser.json())
 
 
@@ -27,15 +28,21 @@ app.listen(port, portCheck())
 
 app.use(express.json());
 
+
+app.use('/', real)
+// app.get('/', (req, res) => {
+//     res.render('login')
+// })
 function real(req, res){
     res.writeHead(200, {"Content-Type" : "text/html"})
-    fs.readFile("index.html", function (error, data){
+    fs.readFile("template/index.html", function (error, data){
         if(error){
             res.writeHead(404)
             res.write("file not found lol")
         }else
         {
             res.write(data)
+            
         }
         res.end()
 
@@ -44,7 +51,6 @@ function real(req, res){
 function portCheck(error){
     if(error){
         console.log("Something went wrong...\n", error)
-
 
     }
     else{

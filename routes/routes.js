@@ -9,7 +9,7 @@ const Model = require('../models/model');
 router.post('/post', async (req, res) => {
     const data = new Model({
         name: req.body.name,
-        age: req.body.age
+        password: req.body.password
     })
 
     try {
@@ -18,6 +18,27 @@ router.post('/post', async (req, res) => {
     }
     catch (error) {
         res.status(400).json({message: error.message})
+    }
+})
+router.post('/login', async (req, res) => {
+    const data = {
+        name: req.body.name,
+        password: req.body.password
+    }
+    const check = await Model.findOne({
+        name: req.body.name,
+        password: req.body.password
+    })
+
+    try{
+        if(check.password == data.password){
+            console.log("true!")      
+            res.json(data)     
+        }
+    }
+    catch{
+        res.send("wrong username/password!")
+
     }
 })
 
