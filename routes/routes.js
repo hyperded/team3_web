@@ -8,6 +8,7 @@ const Model = require('../models/model');
 
 router.post('/post', async (req, res) => {
     const data = new Model({
+        mssv: req.body.mssv,
         name: req.body.name,
         password: req.body.password
     })
@@ -22,18 +23,17 @@ router.post('/post', async (req, res) => {
 })
 router.post('/login', async (req, res) => {
     const data = {
-        name: req.body.name,
+        mssv: req.body.mssv,
         password: req.body.password
     }
     const check = await Model.findOne({
-        name: req.body.name,
+        mssv: req.body.mssv,
         password: req.body.password
     })
 
     try{
         if(check.password == data.password){
-            res.app("true!")      
-            res.json(data)     
+            res.send("true!")      
         }
     }
     catch{
