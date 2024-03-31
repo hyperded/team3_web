@@ -33,8 +33,7 @@ router.post('/login', async (req, res) => {
 
     try{
         if(check.password == data.password){
-            res.send("true!")       # rookie mistake
-
+            res.send("true!")       
         }
     }
     catch{
