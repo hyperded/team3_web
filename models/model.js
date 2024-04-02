@@ -14,17 +14,9 @@ const dataSchema = new mongoose.Schema({
     password: {
         required: true,
         type: String
-    },
-    caTruc: {
-        type: String
-    },
-    hocKy: {
-        type: String
-    },
-    ngayTruc: {
-        type: String
     }
+    
     
 })
 
-module.exports = mongoose.model('Data', dataSchema)
+module.exports = mongoose.model('loginData', dataSchema)
