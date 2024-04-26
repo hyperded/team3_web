@@ -55,5 +55,6 @@ function portCheck(error){
     }
     else{
         console.log("Stalking on ", port)
+        console.log("Connecting to mongodb...")
     }
 }

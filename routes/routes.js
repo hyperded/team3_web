@@ -1,20 +1,26 @@
-const express = require('express');
+const express = require('express')
 const router = express.Router()
-
+const bcrypt = require('bcrypt')
+const saltRounds = 10;
 
 module.exports = router;
 const Model = require('../models/model');
 const trucModel = require('../models/trucModel');
 const { model } = require('mongoose');
 
-router.post('/post', async (req, res) => {
-    const data = new Model({
-        mssv: req.body.mssv,
-        name: req.body.name,
-        password: req.body.password
-    })
+
+
+router.post('/register', async (req, res) => {
+       
 
     try {
+        const hashed = await bcrypt.hash((req.body.password), saltRounds)
+        console.log(hashed)
+            const data = new Model({
+                mssv: req.body.mssv,
+                name: req.body.name,
+                password: hashed})   
+
         const dataToSave = await data.save();
         res.status(200).json(dataToSave)
     }
@@ -36,47 +42,49 @@ router.post('/shiftReg', async (req, res) => {
         res.status(400).json({message: error.message})
     }
 })
-router.post('passwordChange', async  (req, res) => {
-    const data = new model({
-        mssv: req.body.mssv,
-        oldPassword : req.body.password
-    })
-    const check = await Model.findOne({
-        mssv: req.body.mssv,
-        password: req.body.password
-    })
-    try{
-        if (data.oldPassword == check.password && data.mssv == check.mssv){
-            const data = new model({
-                password: req.body.password
-            })
-            const dataToSave = await data.save();
-            res.status(200).json(dataToSave)
-            
-        }
-    }
-    catch (error) {
-        res.status(400).json({message: error.message})
-    }
-})
-router.post('/login', async (req, res) => {
-    const data = {
-        mssv: req.body.mssv,
-        password: req.body.password
-    }
-    const check = await Model.findOne({
-        mssv: req.body.mssv,
-        password: req.body.password
-    })
+router.post('/passwordChange', async  (req, res) => {
+    const data = await Model.findOne({mssv: req.body.mssv})
+    if (data){
 
-    try{
-        if(check.password == data.password){
-            res.send("true!")       
+        try{
+            if( await bcrypt.compare(req.body.password, data.password)){
+                res.send("true!")       
+            }
+            else{
+                res.send("wrong password!")
+            }
         }
+        catch{
+            res.status(500).json({message: "failed"})
+        }}
+    else{
+        res.status(404).json({message: "Credentials not found"})
     }
-    catch{
-        res.send("wrong username/password!")
+
+})
+
+
+router.post('/login', async (req, res) => {
+    const data = await Model.findOne({mssv: req.body.mssv})
+    if (data){
+
+        try{
+            if( await bcrypt.compare(req.body.password, data.password)){
+                res.send("true!")       
+            }
+            else{
+                res.send("wrong password!")
+            }
+        }
+        catch{
+            res.status(500).json({message: "failed"})
+        }}
+    else{
+        res.status(404).json({message: "Credentials not found"})
     }
+        
+
+    
 })
 //Get all Method
 router.get('/getAll', async (req, res) => {
