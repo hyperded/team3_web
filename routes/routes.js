@@ -15,7 +15,6 @@ router.post('/register', async (req, res) => {
 
     try {
         const hashed = await bcrypt.hash((req.body.password), saltRounds)
-        console.log(hashed)
             const data = new Model({
                 mssv: req.body.mssv,
                 name: req.body.name,
@@ -48,7 +47,10 @@ router.post('/passwordChange', async  (req, res) => {
 
         try{
             if( await bcrypt.compare(req.body.password, data.password)){
-                res.send("true!")       
+                const hashed = await bcrypt.hash((req.body.newPassword), saltRounds)
+                data.password = hashed;
+                await data.save()
+                res.status(200);
             }
             else{
                 res.send("wrong password!")
@@ -109,31 +111,32 @@ router.get('/getOne/:id', async (req, res) => {
 })
 
 //Update by ID Method
-router.patch('/update/:id', async (req, res) => {
-    try {
-        const id = req.params.id;
-        const updatedData = req.body;
-        const options = { new: true };
-
-        const result = await Model.findByIdAndUpdate(
-            id, updatedData, options
-        )
-
-        res.send(result)
+router.patch('/adminPass/', async (req, res) => {
+    try{
+            const data = await Model.findOne({mssv: req.body.mssv})
+            const hashed = await bcrypt.hash((req.body.newPassword), saltRounds)
+            data.password = hashed;
+            await data.save()
+            res.status(200);
+        
     }
-    catch (error) {
-        res.status(400).json({ message: error.message })
+    catch{
+        res.status(500).json({message: "failed"})
     }
 })
 
 //Delete by ID Method
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/linrin/', async (req, res) => {
     try {
-        const id = req.params.id;
-        const data = await Model.findByIdAndDelete(id)
-        res.send(`Document with ${data.name} has been deleted..`)
+        const deletion = await Model.findOneAndDelete({mssv: req.body.mssv});
+        if (deletion) {
+            res.status(200).json({messege: " a ok"});
+          } else {
+            res.status(404).json({ message: 'Wrong MSSV' });
+        }
+        
     }
-    catch (error) {
+    catch(error){
         res.status(400).json({ message: error.message })
     }
 })
