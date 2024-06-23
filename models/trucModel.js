@@ -21,6 +21,7 @@ const dataSchema = new mongoose.Schema({
     }
     
     
-})
+    
+}, {versionKey: "VersionKey"})
 
 module.exports = mongoose.model('trucData', dataSchema)

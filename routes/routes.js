@@ -32,33 +32,44 @@ router.post('/register', async (req, res) => {
     }
 })
 router.post('/shiftReg', async (req, res) => {
-    const cond =  trucModel.findOne({mssv: req.body.mssv})
-    console.log(cond)
-    if(cond){
-        if(((req.body.hocKy).equals(cond.hocKy) && req.body.caTruc.equals(cond.caTruc)) && req.body.ngayTruc.equals(cond.ngayTruc)){
-            res.status(400).json({messege: "cant override current time table"})
+    try{
+        const cond = await trucModel.findOne({mssv: req.body.mssv})
+        // console.log(cond)
+        if(cond){
+            if(((req.body.hocKy) === (cond.hocKy) && req.body.caTruc === (cond.caTruc)) && req.body.ngayTruc === (cond.ngayTruc)){
+                res.status(400).json({messege: "cant override current time table"})
+            }
+            else{
+                // do nothing and proceeds to the code below
+                // const data = new trucModel({
+                //     caTruc: req.body.caTruc,
+                //     hocKy: req.body.hocKy,
+                //     ngayTruc: req.body.ngayTruc
+                // })
+                try {
+                    const dataUpdate = await trucModel.updateOne({mssv : req.body.mssv}, {
+                        $set: {caTruc : req.body.caTruc, 
+                               hocKy: req.body.hocKy,
+                                ngayTruc : req.body.ngayTruc}
+                    });
+
+                    res.status(200).json(dataUpdate)
+                    // console.log("yeet")
+
+                }
+                catch (error) {
+                    res.status(400).json({message: error.message})
+                }
+            }
         }
         else{
-            // do nothing and proceeds to the code below
-            const data = new trucModel({
-                caTruc: req.body.caTruc,
-                hocKy: req.body.hocKy,
-                ngayTruc: req.body.ngayTruc
-            })
-            try {
-                const dataToSave = await data.save();
-                res.status(200).json(dataToSave)
-                console.log("yeet")
-            }
-            catch (error) {
-                res.status(400).json({message: error.message})
-            }
+            res.status(404).json({messege: " not found lmfao "});
+
         }
     }
-    else{
-        res.status(404);
+    catch(error){
+        res.status(400).json({messege : "something happened : ", error})
     }
-    
 })
 router.post('/passwordChange', async  (req, res) => {
     const data = await Model.findOne({mssv: req.body.mssv})
