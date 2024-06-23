@@ -19,8 +19,12 @@ router.post('/register', async (req, res) => {
                 mssv: req.body.mssv,
                 name: req.body.name,
                 password: hashed})   
-
+        const alrExists = await Model.findOne({mssv: req.body.mssv})
+        if(alrExists){
+            return res.status(409).json({message : "MSSV Already Registered."})
+        }
         const dataToSave = await data.save();
+        const dataToAlsoSave = await new trucModel({mssv: req.body.mssv}).save();
         res.status(200).json(dataToSave)
     }
     catch (error) {
@@ -28,18 +32,33 @@ router.post('/register', async (req, res) => {
     }
 })
 router.post('/shiftReg', async (req, res) => {
-    const data = new trucModel({
-        caTruc: req.body.caTruc,
-        hocKy: req.body.hocKy,
-        ngayTruc: req.body.ngayTruc
-    })
-    try {
-        const dataToSave = await data.save();
-        res.status(200).json(dataToSave)
+    const cond =  trucModel.findOne({mssv: req.body.mssv})
+    console.log(cond)
+    if(cond){
+        if(((req.body.hocKy).equals(cond.hocKy) && req.body.caTruc.equals(cond.caTruc)) && req.body.ngayTruc.equals(cond.ngayTruc)){
+            res.status(400).json({messege: "cant override current time table"})
+        }
+        else{
+            // do nothing and proceeds to the code below
+            const data = new trucModel({
+                caTruc: req.body.caTruc,
+                hocKy: req.body.hocKy,
+                ngayTruc: req.body.ngayTruc
+            })
+            try {
+                const dataToSave = await data.save();
+                res.status(200).json(dataToSave)
+                console.log("yeet")
+            }
+            catch (error) {
+                res.status(400).json({message: error.message})
+            }
+        }
     }
-    catch (error) {
-        res.status(400).json({message: error.message})
+    else{
+        res.status(404);
     }
+    
 })
 router.post('/passwordChange', async  (req, res) => {
     const data = await Model.findOne({mssv: req.body.mssv})

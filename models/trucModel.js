@@ -2,19 +2,22 @@ const mongoose = require('mongoose');
 
 const dataSchema = new mongoose.Schema({
 
-
+    mssv:{
+        required: true,
+        type: String 
+    },
     caTruc: {
         type: String,
-        required: true
+        // required: true
         
     },
     hocKy: {
         type: String,
-        required: true
+        // required: true
     },
     ngayTruc: {
         type: String,
-        required: true
+        // required: true
     }
     
     
